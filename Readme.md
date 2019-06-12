@@ -56,6 +56,28 @@ google-auth
 virtualenv
 ```
 
+Rename `config.sample.yaml` to `config.yaml`. Open `config.yaml` and change parameters accordingly.
+
+```
+config:
+  git_config_url: "https://user:secret_token@gitlab_full_url/root/test.git/"
+  git_lab_url: "gitlab_full_url"
+  git_api_version: "api/v4/"
+  git_private_token: "private_git_token"
+  receipients: "email@email.com
+```
+
+__git_config_url__ : URL for commiting to gitlab repository from binderhub pod.
+
+__git_lab_url__: URL for gitlab. Used by CORE-RE to download and commit to repository.
+
+__git_api_version__: only "api/v4?" is supported at this stage
+
+__git_private_token__: private token used by CORE-RE server that has global access to the repo.
+
+__recipients__: a list of emails (seperated by comma) to use to email changes in git repository.
+
+
 Run `./run.sh` file to launch the server
 or run the following commands in the terminal (change the URLS appropriately):
 
@@ -81,9 +103,36 @@ python -m flask run -p 5000
 
 
 
+
+#### Minikubernetes Instruction
+
+Follow the guide found here:
+https://github.com/jupyterhub/binderhub/blob/master/CONTRIBUTING.md
+
+Use the following config file:
+```
+# config file for testing with minikube-config.yaml
+import subprocess
+try:
+    minikube_ip = subprocess.check_output(['minikube', 'ip']).decode('utf-8').strip()
+except (subprocess.SubprocessError, FileNotFoundError):
+    minikube_ip = '192.168.1.100'
+
+c.BinderHub.hub_url = 'http://{}:30123'.format(minikube_ip)
+c.BinderHub.hub_api_token = 'aec7d32df938c0f55e54f09244a350cb29ea612907ed4f07be13d9553d18a8e4'
+c.BinderHub.use_registry = False
+c.BinderHub.build_namespace = 'binder-test'
+c.BinderHub.tornado_settings.update({
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+        }
+})
+```
+
+
 ### Setting up  GitLab Server
 
-
+Follow instructions found on https://about.gitlab.com/install/ to set up your own gitlab. There is not really anything you need to do except to get the private token.
 
 
 

@@ -73,7 +73,7 @@ __git_lab_url__: URL for gitlab. Used by CORE-RE to download and commit to repos
 
 __git_api_version__: only "api/v4?" is supported at this stage
 
-__git_private_token__: private token used by CORE-RE server that has global access to the repo.
+__git_private_token__: private token used by CORE-RE server that has global access
 
 __recipients__: a list of emails (seperated by comma) to use to email changes in git repository.
 

@@ -1,0 +1,11 @@
+config.yaml
+run2.sh
+temp/
+.DS_STORE
+*.pyo
+*.pyc
+.py[cod]
+*.so
+__pycache__/
+=0.36
+=0.37

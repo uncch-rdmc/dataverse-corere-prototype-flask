@@ -1,0 +1,6 @@
+config:
+  git_config_url: "https://user:secret_token@gitlab_full_url/root/test.git/"
+  git_lab_url: "gitlab_full_url"
+  git_api_version: "api/v4/"
+  git_private_token: "private_git_token"
+  receipients: "email@email.com"

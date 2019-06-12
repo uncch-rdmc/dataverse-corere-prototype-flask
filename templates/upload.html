@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="hero is-info is-medium is-bold background-tint" style="background-image: url({{url_for('static', filename='background.jpg')}}); background-size: cover;">
+    <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-item" href="/">
+                            <img src="{{url_for('static', filename='CORE2.png')}}" alt="CORE2" title="Logo" style="max-height:64px">
+                        </a>
+                        <span class="navbar-burger burger" data-target="navbarMenu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+                    <div id="navbarMenu" class="navbar-menu">
+                        <div class="navbar-end">
+                            <div class="tabs is-right">
+                                <ul>
+                                    <li><a href="/">Home</a></li>
+                                    <li class="is-active"><a href="/upload">Get Started</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    <div class="container">
+            <div class="column is-three-fifths is-offset-one-fifth">
+                <div class="card">
+                    <div class="card-image has-text-centered">
+                        <i class="fa fa-database"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="content">
+                            <h1>Drop your files here</h1>
+                            <p>Please do NOT upload any files in zip format.</p>
+                            <form action="/uploadfiles" name="file"
+                                class="dropzone"
+                                id="my-awesome-dropzone">
+                                
+                            </form>
+
+                            <br/><br/>
+                            <form id="start_btn" action="/load" method="post">
+                                <button class="button is-primary is-large" type="submit">
+                                  <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                   &nbsp; Start Environment</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+       
+
+</section>
+
+
+<div id="launchmodal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+        <p class="modal-card-title">Launching Core2 Environment</p>
+        <p>DO NOT CLOSE THE WINDOW</p>
+        </header>
+        <section class="modal-card-body">
+                <progress id="progress" class="progress is-warning" value="0" max="100"></progress>
+                <textarea readonly id="info"
+                style="height:500px;width:100%; resize: none"></textarea>
+        </section>
+        <footer class="modal-card-foot">
+        </footer>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/basic.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
+<script>
+Dropzone.options.myAwesomeDropzone = {
+  paramName: "file", // The name that will be used to transfer the file
+  maxFilesize: 0, // MB
+  accept: function(file, done) {
+    if (file.name.indexOf(".zip") != -1) {
+      done("Cannot upload zip files!");
+    }
+    else { done(); }
+  },
+
+  addRemoveLinks: true,
+
+  success: function(file) {
+    //file.previewElement = Dropzone.createElement(this.options.previewTemplate);
+
+
+    console.log(file)
+    // Now attach this new element some where in your page
+  },
+};
+</script>
+
+
+
+<script>
+
+    $('#start_btn').click(function(e){
+        e.preventDefault();
+
+        $("#launchmodal").addClass('is-active');
+
+        $.get( "/load", function(data){
+          data_json = JSON.parse(data);
+          if (data_json['status'] == "Success"){
+            logme("==DOWNLOADED SUCCESFULLY==\r\n");
+            xdc(data_json['URI'],data_json['Code']);
+          } else{
+            logme("==SOMETHING WENT WRONG. PLEASE RESTART==\r\n");
+          }
+        });
+
+
+    });
+
+
+    function logme(text){
+        $("#info").val($("#info").val()+text);
+    }
+    $("#info").val("");
+
+
+    function xdc(repo,shacode) {
+        $("#progress").html('<div class="determinate" style="width: 0%"></div>');
+        
+        repo_e = encodeURIComponent(repo);
+        var evtSource = new EventSource("http://127.0.0.1:8585/build/git/"+repo_e+"/"+shacode);
+        
+        evtSource.onerror = function(e) {
+          console.log("EventSource failed.");
+          console.log(e);
+          //logme(e['data'].toString());
+          logme("Cannot Connect to the server...")
+        };
+
+
+        evtSource.onmessage = function(e) {
+          message = e['data'];
+          console.log(message);
+          phase = JSON.parse(message)['phase'];
+          msg = JSON.parse(message)['message'];
+          if(phase == "waiting"){
+            $('#progress').val(10)
+          }
+          if(phase == "fetching"){
+            $('#progress').val(20)
+          }
+          if(phase == "building"){
+            $('#progress').val(45)
+          }
+          if(phase == "built"){
+            $('#progress').val(70)
+          }
+          if(phase == 'launching'){
+            $('#progress').val(90)
+          }
+          logme(msg)
+          if(phase == 'ready'){
+            $('#progress').val(100)
+            evtSource.close();
+            var lab = "lab"
+            var origin = window.location.origin;
+            window.location = "/binder?url="+JSON.parse(message)['url']+""+lab+"/?token="+JSON.parse(message)['token']+"&ref="+origin;
+          }
+          $('#info').scrollTop($('#info')[0].scrollHeight);
+        }
+    }
+
+</script>
+{% endblock %}

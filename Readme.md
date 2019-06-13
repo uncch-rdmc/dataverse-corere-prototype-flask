@@ -14,6 +14,7 @@ The main goal of the project is to make these verification tools cost-effective 
 * [Contributing](#Contributing)
 * [Credits](#Credits)
 * [License](#License)
+* [Future Work](#Future)
 
 
 ## Requirements:
@@ -27,6 +28,8 @@ Kubernetes and Docker is required for running binderhub.
 @andreyodum/core2 jupyterlab extension to use with jupyterhub (installed automatically)
 
 R and R server (automatically installed by binderhub)
+
+CentOS or RHEL is preferred, but is not required.
 
 ## Installation:
 
@@ -48,7 +51,7 @@ pip install -r requirements.txt
 ```
 
 This will install the following libraries:
-```
+```python
 authlib==0.10
 flask==1.0.2
 google-api-python-client
@@ -58,7 +61,7 @@ virtualenv
 
 Rename `config.sample.yaml` to `config.yaml`. Open `config.yaml` and change parameters accordingly.
 
-```
+```yaml
 config:
   git_config_url: "https://user:secret_token@gitlab_full_url/root/test.git/"
   git_lab_url: "gitlab_full_url"
@@ -73,7 +76,7 @@ __git_lab_url__: URL for gitlab. Used by CORE-RE to download and commit to repos
 
 __git_api_version__: only "api/v4?" is supported at this stage
 
-__git_private_token__: private token used by CORE-RE server that has global access
+__git_private_token__: private token used by CORE-RE server that has global access.
 
 __recipients__: a list of emails (seperated by comma) to use to email changes in git repository.
 
@@ -81,7 +84,7 @@ __recipients__: a list of emails (seperated by comma) to use to email changes in
 Run `./run.sh` file to launch the server
 or run the following commands in the terminal (change the URLS appropriately):
 
-```github
+```bash
 export FN_AUTH_REDIRECT_URI=http://localhost:5000/google/auth
 export FN_BASE_URI=http://localhost:5000
 export FN_CLIENT_ID=GOOGLE_CLIENT_ID_GOES_HERE
@@ -103,14 +106,82 @@ python -m flask run -p 5000
 
 
 
-
 #### Minikubernetes Instruction
+
 
 Follow the guide found here:
 https://github.com/jupyterhub/binderhub/blob/master/CONTRIBUTING.md
 
-Use the following config file:
+or use the following (This guide assumes you are on CentOS):
+
+```bash
+sudo apt install socat -y
 ```
+
+##### Download and install kubectl
+```bash
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+```
+
+```bash
+chmod +x ./kubectl
+```
+
+```bash
+sudo mv ./kubectl /usr/local/bin/kubectl
+```
+
+##### Install VirtualBox
+Download the latest version of virtualbox at https://www.virtualbox.org/wiki/Downloads
+
+##### Install Minikube
+```bash
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+  && chmod +x minikube
+```
+
+Add minikube executable to the path
+```
+sudo install minikube /usr/local/bin
+```
+
+Start Minikube 
+```bash
+minikube start
+```
+
+Clone the binderhub repository to your local computer and cd into it.
+```bash
+git clone https://github.com/jupyterhub/binderhub
+cd binderhub
+```
+
+Install helm to manage installating JupyterHub and Binderhub on cluster.
+```bash
+curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+```
+
+Initialize helm in minikube.
+```bash
+helm init
+```
+
+Add JupyterHub helm charts repo
+```bash
+helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+helm repo update
+```
+
+Install BinderHub and its development requirements
+```bash
+python3 -m pip install -e . -r dev-requirements.txt
+```
+
+
+Copy the following into your binderhub directory. 
+File Path: binderhub/testing/minikube/binderhub_config.py
+
+```python
 # config file for testing with minikube-config.yaml
 import subprocess
 try:
@@ -122,6 +193,9 @@ c.BinderHub.hub_url = 'http://{}:30123'.format(minikube_ip)
 c.BinderHub.hub_api_token = 'aec7d32df938c0f55e54f09244a350cb29ea612907ed4f07be13d9553d18a8e4'
 c.BinderHub.use_registry = False
 c.BinderHub.build_namespace = 'binder-test'
+
+### The command below is important to allow other hosts to access
+### Feel free to change this setting to only allow access from specific domain
 c.BinderHub.tornado_settings.update({
         'headers': {
             'Access-Control-Allow-Origin': '*',
@@ -129,17 +203,44 @@ c.BinderHub.tornado_settings.update({
 })
 ```
 
+Install JupyterHub in minikube 
+```bash
+./testing/minikube/install-hub
+```
 
-### Setting up  GitLab Server
+Set up docker daemon
+```bash
+eval $(minikube docker-env)
+```
 
-Follow instructions found on https://about.gitlab.com/install/ to set up your own gitlab. There is not really anything you need to do except to get the private token.
+Start BinderHub with the testing config file
+```bash
+python3 -m binderhub -f testing/minikube/binderhub_config.py
+```
+
+Visit http://localhost:8585
+
+Your binderhub should now be set up on the server.
+
+#### Kubernetes Instructions
+
+Follow the guide found at:
+https://binderhub.readthedocs.io/en/latest/create-cloud-resources.html
 
 
+### Setting up GitLab Server
+
+Follow instructions found on https://about.gitlab.com/install/ to set up your own gitlab. There is not really anything you need to do except to get the private token. 
 
 ## Usage
 
 
 
+## Future work
+
+User Roles
+
+Detection 
 
 
 ## Contributing

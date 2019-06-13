@@ -140,6 +140,10 @@ def create_import_init():
     return request.values.get('files')
         
 
+@app.route('/gitlab_hook')
+def git_lab_hook():
+    ### Copy Generated Docker file to repo
+    #kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar
 
 @app.route('/create')
 def create_catalog():

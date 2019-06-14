@@ -144,6 +144,7 @@ def create_import_init():
 def git_lab_hook():
     ### Copy Generated Docker file to repo
     #kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar
+    pass
 
 @app.route('/create')
 def create_catalog():
@@ -283,6 +284,8 @@ git remote set-url origin {2}
 
 
     #TEMPORARY
+    ### In the future, please follow this link https://binderhub.readthedocs.io/en/latest/setup-binderhub.html
+    ### and setup GitLabRepoProvider with private token TO ENSURE THAT GITLAB PROJECTS ARE ALL PRIVATE
     GITLAB_URL = config["git_lab_url"]
     GITLAB_API = GITLAB_URL+"/"+config["git_api_version"]
     PRIVATE_TOKEN = "private_token="+config['git_private_token']

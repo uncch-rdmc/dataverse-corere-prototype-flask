@@ -15,8 +15,9 @@ COPY . /corere/
 
 # Application Environment variables
 ENV APP_ENV development
+RUN export APP_DOCKER=True
 
-# Exposing Ports
+# Expose port 5000
 EXPOSE 5000
 
 # Setting Persistent data

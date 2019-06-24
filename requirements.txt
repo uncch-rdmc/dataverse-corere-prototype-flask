@@ -3,3 +3,8 @@ flask==1.0.2
 google-api-python-client
 google-auth
 virtualenv
+Flask-Assets
+flask_sqlalchemy
+requests_oauthlib
+pyyaml
+psycopg2

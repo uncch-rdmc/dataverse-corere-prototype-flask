@@ -293,7 +293,7 @@ git remote set-url origin {2}
                 'Content-Type': 'application/json'}
 
 
-    username = session['username']
+    username = "test"
     
     requests.delete(GITLAB_API+"/projects/"+urllib.parse.quote("root/"+username, safe='')+"/?"+PRIVATE_TOKEN)
     while 1:

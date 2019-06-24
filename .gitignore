@@ -1,5 +1,5 @@
 config.yaml
-run2.sh
+run.sh
 temp/
 .DS_STORE
 *.pyo

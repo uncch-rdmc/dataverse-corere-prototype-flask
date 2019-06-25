@@ -15,10 +15,13 @@ COPY . /corere/
 
 # Application Environment variables
 ENV APP_ENV development
-RUN export APP_DOCKER=True
+ENV APP_DOCKER=True
 
 # Expose port 5000
 EXPOSE 5000
+# Expose Postgres
+EXPOSE 5432
+
 
 # Setting Persistent data
 VOLUME ["/app-data"]

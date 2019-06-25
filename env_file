@@ -1,0 +1,4 @@
+POSTGRES_USER=postgresondocker
+POSTGRES_PASSWORD=postgresondocker
+POSTGRES_DB=core
+DATABASE_URL=postgresql+psycopg2://postgresondocker:postgresondocker@db:5432/core

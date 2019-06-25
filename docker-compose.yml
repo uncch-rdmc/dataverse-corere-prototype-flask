@@ -1,0 +1,29 @@
+version: '3'
+services:
+  db:
+    image: postgres:9.3
+    build: ./postgres/
+    env_file:
+      - env_file
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - db_nw
+    
+  flaskapp:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - env_file
+    volumes:
+      - .:/opt/services/flaskapp/src
+    networks:
+      - db_nw
+    depends_on:
+      - db
+networks:
+  db_nw:
+    driver: bridge
+volumes:
+  dbdata:

@@ -12,4 +12,8 @@ export FN_FLASK_SECRET_KEY=RANDOMSECRETdsjaldsajio
 
 export DATABASE_URL="postgresql://localhost/core"
 
-python -m flask run -p 5000
+if [[ -z "${APP_DOCKER}" ]]; then
+   python -m flask run --host=0.0.0.0
+else
+   python -m flask run
+fi

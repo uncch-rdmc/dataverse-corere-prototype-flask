@@ -10,6 +10,7 @@ import json
 import time
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists, create_database
 
 from controller.google import app_google
 from controller.github import app_github
@@ -29,9 +30,13 @@ assets.url = app.static_url_path
 scss = Bundle('custom.scss', filters='pyscss', output='all.css')
 assets.register('scss_all', scss)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', default='postgresql://localhost/core')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+if not database_exists(os.environ.get('DATABASE_URL')):
+   create_database(os.environ.get('DATABASE_URL'))
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+db.create_all()
 
 from config_loader import *
 from models import Users, Catalog

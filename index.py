@@ -30,6 +30,8 @@ assets.url = app.static_url_path
 scss = Bundle('custom.scss', filters='pyscss', output='all.css')
 assets.register('scss_all', scss)
 
+from models import *
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 if not database_exists(os.environ.get('DATABASE_URL')):
    create_database(os.environ.get('DATABASE_URL'))
@@ -37,10 +39,11 @@ if not database_exists(os.environ.get('DATABASE_URL')):
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 db.create_all()
+db.session.commit()
 
 from config_loader import *
-from models import Users, Catalog
 
+import database
 
 def get_or_create(session, model, **kwargs):
     instance = session.query(model).filter_by(**kwargs).first()
@@ -52,6 +55,7 @@ def get_or_create(session, model, **kwargs):
         session.commit()
         return instance
 
+database.init_db()
 
 @app.route('/')
 @app.route('/index')

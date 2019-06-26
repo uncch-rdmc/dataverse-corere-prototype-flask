@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  DATABASE_URL: postgresql+psycopg2://postgresondocker:postgresondocker@db:5432/core
+  POSTGRES_DB: core
+  POSTGRES_PASSWORD: postgresondocker
+  POSTGRES_USER: postgresondocker
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db-envf
+  name: db-envf

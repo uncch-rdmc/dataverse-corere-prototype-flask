@@ -1,27 +1,38 @@
 version: '3'
 services:
   db:
-    image: postgres:9.3
+    image: "andreyodum/db:latest"
     build: ./postgres/
     env_file:
-      - env_file
+      - envf
     volumes:
       - dbdata:/var/lib/postgresql/data
     networks:
       - db_nw
-    
+    container_name: db
+    ports:
+      - "5432:5432"
+    labels:
+       kompose.service.expose: "true"
   flaskapp:
+    restart: always
+    image: "andreyodum/flaskapp:latest"
     build: .
+    links:
+      - "db:db"
     ports:
       - "5000:5000"
     env_file:
-      - env_file
+      - envf
     volumes:
       - .:/opt/services/flaskapp/src
     networks:
       - db_nw
     depends_on:
       - db
+    container_name: flaskapp
+    labels:
+      kompose.service.expose: "true"
 networks:
   db_nw:
     driver: bridge

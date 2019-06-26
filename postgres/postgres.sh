@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### Testing purposes only. DO NOT USE IT IN PRODUCTION
+
 sudo docker network prune -f
 sudo docker system prune -f
 
